@@ -1,36 +1,68 @@
 // App.jsx
 import React, { useState } from 'react';
-import UmlEditor from './components/UmlEditor';
+import MermaidUmlEditor from './components/MermaidUmlEditor';
 import XmlTransformer from './components/XmlTransformer';
 import DtdGenerator from './components/DtdGenerator';
-import { transformUmlToXml, generateDtd } from './utils/transformationRules';
+import { parseMermaidToUmlModel } from './utils/mermaidParser';
+import { generateXmlFromUml } from './utils/xmlGenerator';
+import { generateDtdFromUml } from './utils/dtdGenerator';
 import './App.css';
 
 function App() {
-  const [umlDiagram, setUmlDiagram] = useState(null);
+  const [mermaidCode, setMermaidCode] = useState(`classDiagram
+    class Animal {
+      +String name
+      +int age
+      +eat() void
+    }
+    
+    class Dog {
+      +bark() void
+    }
+    
+    class Cat {
+      +meow() void
+    }
+    
+    Animal <|-- Dog
+    Animal <|-- Cat`);
+    
   const [xmlOutput, setXmlOutput] = useState('');
   const [dtdOutput, setDtdOutput] = useState('');
+  const [error, setError] = useState('');
 
   const handleTransform = () => {
-    if (umlDiagram) {
-      const xml = transformUmlToXml(umlDiagram);
-      const dtd = generateDtd(umlDiagram);
+    try {
+      setError('');
+      const umlModel = parseMermaidToUmlModel(mermaidCode);
+      const xml = generateXmlFromUml(umlModel);
+      const dtd = generateDtdFromUml(umlModel);
+      
       setXmlOutput(xml);
       setDtdOutput(dtd);
+    } catch (err) {
+      setError(`Error en la transformación: ${err.message}`);
     }
   };
 
   return (
     <div className="app">
       <header className="app-header">
-        <h1>Transformador UML a XML</h1>
-        <p>Basado en el modelo de transformación del artículo</p>
+        <h1>🔄 Transformador UML a XML</h1>
+        <p>Usando Mermaid.js para diagramas UML - Basado en el artículo de transformación</p>
       </header>
       
+      {error && (
+        <div className="error-banner">
+          ⚠️ {error}
+        </div>
+      )}
+      
       <div className="app-container">
-        <div className="editor-section">
-          <UmlEditor 
-            onDiagramChange={setUmlDiagram}
+        <div className="input-section">
+          <MermaidUmlEditor 
+            mermaidCode={mermaidCode}
+            onCodeChange={setMermaidCode}
             onTransform={handleTransform}
           />
         </div>
