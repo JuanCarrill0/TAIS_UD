@@ -136,7 +136,7 @@
   color: #2d3436;
 }
 
-.copy-btn, .refresh-btn {
+.copy-btn, .refresh-btn, .download-btn {
   padding: 0.3rem 0.8rem;
   background: #636e72;
   color: white;

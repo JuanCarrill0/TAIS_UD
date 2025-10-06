@@ -1,5 +1,6 @@
 // components/DtdGenerator.jsx
 import React from 'react';
+import { downloadFile } from '../utils/fileDownloader'; 
 
 const DtdGenerator = ({ dtdContent }) => {
   const copyToClipboard = async () => {
@@ -11,6 +12,15 @@ const DtdGenerator = ({ dtdContent }) => {
     }
   };
 
+
+const dtdDownload = () => {
+    if (!dtdContent) {
+      alert('No hay contenido para descargar');
+      return;
+    }
+    downloadFile(dtdContent, 'modeloDTD.dtd', 'application/xml-dtd');
+  };
+  
   return (
     <div className="dtd-generator">
       <div className="section-header">
@@ -21,6 +31,13 @@ const DtdGenerator = ({ dtdContent }) => {
           className="copy-btn"
         >
           📋 Copiar DTD
+        </button>
+        <button 
+              onClick={dtdDownload}
+              disabled={!dtdContent}
+              className="download-btn"
+        >
+              💾 Descargar DTD
         </button>
       </div>
       
