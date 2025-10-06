@@ -40,8 +40,8 @@ export class UmlModel {
     if (match) {
       return {
         visibility: match[1] === '+' ? 'public' : 'private',
-        name: match[2],
-        type: match[3]
+        name: match[3],
+        type: match[2]
       };
     }
     return {
