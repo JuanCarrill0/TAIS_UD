@@ -1,5 +1,6 @@
 // components/XmlTransformer.jsx
 import React from 'react';
+import { downloadFile } from '../utils/fileDownloader'; 
 
 const XmlTransformer = ({ xmlContent }) => {
   const formatXml = (xml) => {
@@ -23,6 +24,14 @@ const XmlTransformer = ({ xmlContent }) => {
     }
   };
 
+  const xmlDownload = () => {
+      if (!xmlContent) {
+        alert('No hay contenido para descargar');
+        return;
+      }
+      downloadFile(xmlContent, 'modeloXML.xml', 'application/xml-dtd');
+    };
+
   return (
     <div className="xml-transformer">
       <div className="section-header">
@@ -33,6 +42,13 @@ const XmlTransformer = ({ xmlContent }) => {
           className="copy-btn"
         >
           📋 Copiar XML
+        </button>
+        <button 
+              onClick={xmlDownload}
+              disabled={!xmlContent}
+              className="download-btn"
+        >
+              💾 Descargar XML
         </button>
       </div>
       
