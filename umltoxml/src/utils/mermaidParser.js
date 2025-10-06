@@ -195,7 +195,7 @@ const parseAssociation = (line) => {
   }
   
   // Patrón para asociaciones con multiplicidad
-  const multiPattern = /(\w+)\s*"([^"]*)"\s*--\s*"([^"]*)"\s*(\w+)/;
+  const multiPattern = /(\w+)\s*"([^"]*)"\s*-->\s*"([^"]*)"\s*(\w+)/;
   const multiMatch = line.match(multiPattern);
   
   if (multiMatch) {
