@@ -1,5 +1,5 @@
 // components/MermaidUmlEditor.jsx
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import mermaid from 'mermaid';
 
 const MermaidUmlEditor = ({ mermaidCode, onCodeChange, onTransform }) => {
@@ -20,21 +20,17 @@ const MermaidUmlEditor = ({ mermaidCode, onCodeChange, onTransform }) => {
     });
   }, []);
 
-  // Renderizar diagrama
-  const renderDiagram = async () => {
+  const renderDiagram = useCallback(async () => {
     if (!mermaidCode.trim()) {
       setSvgOutput('<div class="diagram-placeholder">Escribe código Mermaid para ver la vista previa</div>');
       return;
     }
-    
     setIsLoading(true);
     try {
-      // Usar un ID único para evitar conflictos
       const containerId = `mermaid-${Date.now()}`;
       if (mermaidRef.current) {
         mermaidRef.current.innerHTML = `<div id="${containerId}">${mermaidCode}</div>`;
       }
-      
       const { svg } = await mermaid.render(containerId, mermaidCode);
       setSvgOutput(svg);
     } catch (error) {
@@ -47,15 +43,14 @@ const MermaidUmlEditor = ({ mermaidCode, onCodeChange, onTransform }) => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [mermaidCode]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
       renderDiagram();
-    }, 500); // Debounce para evitar renderizados frecuentes
-    
+    }, 500);
     return () => clearTimeout(timer);
-  }, [mermaidCode]);
+  }, [mermaidCode, renderDiagram]);
 
   const handleCodeChange = (newCode) => {
     onCodeChange(newCode);
