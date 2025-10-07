@@ -1,23 +1,22 @@
-/* App.css */
+/* App.css - Tema oscuro con azul */
 .app {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #23272e 0%, #22304a 100%);
+  font-family: 'Inter', 'Roboto', 'Segoe UI', Arial, sans-serif;
 }
 
 .app-header {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  color: #2c3e50;
+  background: #181a20;
+  color: #5dade2;
   padding: 1.5rem 2rem;
   text-align: center;
-  box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 20px rgba(0,0,0,0.4);
 }
 
 .app-header h1 {
   margin: 0;
   font-size: 2.2rem;
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: linear-gradient(135deg, #5dade2, #2980b9);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -27,6 +26,7 @@
   margin: 0.5rem 0 0 0;
   opacity: 0.8;
   font-size: 1.1rem;
+  color: #dfe6e9;
 }
 
 .error-banner {
@@ -54,16 +54,16 @@
 
 /* Editor Mermaid */
 .mermaid-editor {
-  background: white;
+  background: #353b48;
   border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
   overflow: hidden;
 }
 
 .editor-header {
   padding: 1.5rem;
-  background: linear-gradient(135deg, #74b9ff, #0984e3);
-  color: white;
+  background: linear-gradient(135deg, #34495e, #23272e);
+  color: #5dade2;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -84,14 +84,14 @@
   padding: 0.5rem 1rem;
   border: none;
   border-radius: 6px;
-  background: rgba(255,255,255,0.9);
-  color: #2d3436;
+  background: #22304a;
+  color: #5dade2;
   cursor: pointer;
 }
 
 .transform-btn {
   padding: 0.7rem 1.5rem;
-  background: #00b894;
+  background: #2980b9;
   color: white;
   border: none;
   border-radius: 6px;
@@ -101,31 +101,31 @@
 }
 
 .transform-btn:hover:not(:disabled) {
-  background: #00a085;
+  background: #2471a3;
   transform: translateY(-2px);
 }
 
 .transform-btn:disabled {
-  background: #b2bec3;
+  background: #34495e;
   cursor: not-allowed;
 }
 
 .editor-container {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  height: 400px;
+  height: 670px;
 }
 
 .code-panel, .preview-panel {
   display: flex;
   flex-direction: column;
-  border-right: 1px solid #e0e0e0;
+  border-right: 1px solid #23272e;
 }
 
 .panel-header {
   padding: 1rem;
-  background: #f8f9fa;
-  border-bottom: 1px solid #e0e0e0;
+  background: #181a20;
+  border-bottom: 1px solid #23272e;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -133,13 +133,13 @@
 
 .panel-header h4 {
   margin: 0;
-  color: #2d3436;
+  color: #5dade2;
 }
 
 .copy-btn, .refresh-btn, .download-btn {
   padding: 0.3rem 0.8rem;
-  background: #636e72;
-  color: white;
+  background: #34495e;
+  color: #5dade2;
   border: none;
   border-radius: 4px;
   font-size: 0.8rem;
@@ -150,12 +150,13 @@
   flex: 1;
   border: none;
   padding: 1rem;
-  font-family: 'Courier New', monospace;
-  font-size: 0.9rem;
-  line-height: 1.4;
+  font-family: 'Fira Mono', 'Consolas', 'Courier New', monospace;
+  font-size: 0.95rem;
+  line-height: 1.5;
   resize: none;
   outline: none;
-  background: #fafafa;
+  background: #22304a;
+  color: #f8f8f2;
 }
 
 .mermaid-preview {
@@ -164,7 +165,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #fafafa;
+  background: #eaf6fb; /* Fondo más claro para la vista previa */
   overflow: auto;
 }
 
@@ -173,60 +174,18 @@
   max-height: 100%;
 }
 
-/* Ayuda de sintaxis */
-.syntax-help {
-  padding: 1rem;
-  background: #f8f9fa;
-  border-top: 1px solid #e0e0e0;
-}
-
-.syntax-help details {
-  cursor: pointer;
-}
-
-.syntax-help summary {
-  font-weight: bold;
-  color: #2d3436;
-}
-
-.help-content {
-  margin-top: 1rem;
-  display: grid;
-  gap: 1rem;
-}
-
-.help-section {
-  padding: 0.8rem;
-  background: white;
-  border-radius: 6px;
-  border-left: 4px solid #74b9ff;
-}
-
-.help-section h5 {
-  margin: 0 0 0.5rem 0;
-  color: #2d3436;
-}
-
-.help-section code {
-  background: #f1f2f6;
-  padding: 0.2rem 0.4rem;
-  border-radius: 3px;
-  font-size: 0.85rem;
-  color: #e17055;
-}
-
 /* Componentes de salida */
 .xml-transformer, .dtd-generator {
-  background: white;
+  background: #353b48;
   border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
   overflow: hidden;
 }
 
 .section-header {
   padding: 1.2rem;
-  background: linear-gradient(135deg, #a29bfe, #6c5ce7);
-  color: white;
+  background: linear-gradient(135deg, #2980b9, #23272e);
+  color: #5dade2;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -244,13 +203,13 @@
 
 .xml-code,
 .dtd-code {
-  background: #23272e;      /* Fondo oscuro */
-  color: #f8f8f2;           /* Texto claro */
+  background: #22304a;
+  color: #f8f8f2;
   padding: 1em;
   border-radius: 6px;
-  max-height: 300px;        /* Altura máxima para scroll */
-  overflow: auto;           /* Habilita scroll */
-  font-family: 'Fira Mono', 'Consolas', monospace;
+  max-height: 300px;
+  overflow: auto;
+  font-family: 'Fira Mono', 'Consolas', 'Courier New', monospace;
   font-size: 1em;
   white-space: pre;
   margin: 0;
@@ -264,16 +223,16 @@
 }
 
 .code-container::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: #23272e;
 }
 
 .code-container::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
+  background: #34495e;
   border-radius: 4px;
 }
 
 .code-container::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8;
+  background: #5dade2;
 }
 
 /* Responsive */

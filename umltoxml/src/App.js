@@ -48,8 +48,7 @@ function App() {
   return (
     <div className="app">
       <header className="app-header">
-        <h1>🔄 Transformador UML a XML</h1>
-        <p>Usando Mermaid.js para diagramas UML - Basado en el artículo de transformación</p>
+        <h1>Transformador UML a DTD y XML</h1>
       </header>
       
       {error && (

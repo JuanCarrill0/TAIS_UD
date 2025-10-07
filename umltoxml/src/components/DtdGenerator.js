@@ -30,14 +30,14 @@ const dtdDownload = () => {
           disabled={!dtdContent}
           className="copy-btn"
         >
-          📋 Copiar DTD
+          Copiar DTD
         </button>
         <button 
               onClick={dtdDownload}
               disabled={!dtdContent}
               className="download-btn"
         >
-              💾 Descargar DTD
+              Descargar DTD
         </button>
       </div>
       

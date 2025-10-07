@@ -103,7 +103,7 @@ const MermaidUmlEditor = ({ mermaidCode, onCodeChange, onTransform }) => {
   return (
     <div className="mermaid-editor">
       <div className="editor-header">
-        <h3>📊 Editor UML Mermaid</h3>
+        <h3>Editor UML Mermaid</h3>
         <div className="editor-controls">
           <select 
             onChange={(e) => {
@@ -125,7 +125,7 @@ const MermaidUmlEditor = ({ mermaidCode, onCodeChange, onTransform }) => {
             disabled={isLoading}
             className="transform-btn"
           >
-            {isLoading ? '⏳ Procesando...' : '🔄 Transformar a XML'}
+            {isLoading ? 'Procesando...' : 'Transformar a XML'}
           </button>
         </div>
       </div>
@@ -133,12 +133,12 @@ const MermaidUmlEditor = ({ mermaidCode, onCodeChange, onTransform }) => {
       <div className="editor-container">
         <div className="code-panel">
           <div className="panel-header">
-            <h4>📝 Código Mermaid</h4>
+            <h4>Código Mermaid</h4>
             <button 
               onClick={() => navigator.clipboard.writeText(mermaidCode)}
               className="copy-btn"
             >
-              📋 Copiar
+              Copiar
             </button>
           </div>
           <textarea
@@ -152,13 +152,13 @@ const MermaidUmlEditor = ({ mermaidCode, onCodeChange, onTransform }) => {
 
         <div className="preview-panel">
           <div className="panel-header">
-            <h4>👁️ Vista Previa</h4>
+            <h4>Vista Previa</h4>
             <button 
               onClick={renderDiagram}
               disabled={isLoading}
               className="refresh-btn"
             >
-              🔄 Actualizar
+              Actualizar
             </button>
           </div>
           <div 
@@ -167,28 +167,6 @@ const MermaidUmlEditor = ({ mermaidCode, onCodeChange, onTransform }) => {
             dangerouslySetInnerHTML={{ __html: svgOutput }}
           />
         </div>
-      </div>
-
-      <div className="syntax-help">
-        <details>
-          <summary>📚 Sintaxis Mermaid - Ayuda Rápida</summary>
-          <div className="help-content">
-            <div className="help-section">
-              <h5>Clases:</h5>
-              <code>class NombreClase &#123; +tipo atributo +metodo() tipo &#125;</code>
-            </div>
-            <div className="help-section">
-              <h5>Herencia:</h5>
-              <code>ClasePadre &lt;|-- ClaseHija</code>
-            </div>
-            <div className="help-section">
-              <h5>Asociaciones:</h5>
-              <code>ClaseA "1" -- "1" ClaseB</code><br/>
-              <code>ClaseA "1" -- "*" ClaseB</code><br/>
-              <code>ClaseA "0..1" -- "1..*" ClaseB</code>
-            </div>
-          </div>
-        </details>
       </div>
     </div>
   );

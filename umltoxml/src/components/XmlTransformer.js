@@ -41,14 +41,14 @@ const XmlTransformer = ({ xmlContent }) => {
           disabled={!xmlContent}
           className="copy-btn"
         >
-          📋 Copiar XML
+          Copiar XML
         </button>
         <button 
               onClick={xmlDownload}
               disabled={!xmlContent}
               className="download-btn"
         >
-              💾 Descargar XML
+              Descargar XML
         </button>
       </div>
       
