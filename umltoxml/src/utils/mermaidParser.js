@@ -73,10 +73,11 @@ export class UmlModel {
 export const parseMermaidToUmlModel = (mermaidCode) => {
   const model = new UmlModel();
   const lines = mermaidCode.split('\n').map(line => line.trim()).filter(line => line);
-  
+
   let currentSection = null;
   let currentClass = null;
   let readingClassContent = false;
+  let classContentBuffer = [];
 
   for (const line of lines) {
     if (line.startsWith('classDiagram')) {
@@ -87,26 +88,37 @@ export const parseMermaidToUmlModel = (mermaidCode) => {
     if (currentSection === 'classDiagram') {
       // Parsear definición de clase
       if (line.startsWith('class ')) {
-        readingClassContent = false;
         const classMatch = line.match(/class\s+(\w+)\s*\{?/);
         if (classMatch) {
           currentClass = classMatch[1];
-          // Verificar si la línea tiene {
+          classContentBuffer = [];
           if (line.includes('{')) {
             readingClassContent = true;
           } else {
             model.addClass(currentClass, [], []);
+            currentClass = null;
           }
         }
       }
       // Parsear contenido de clase
       else if (readingClassContent && currentClass) {
         if (line.includes('}')) {
+          // Procesar atributos y métodos
+          const attributes = [];
+          const methods = [];
+          classContentBuffer.forEach(item => {
+            if (item.includes('(') && item.includes(')')) {
+              methods.push(item);
+            } else if (item.trim()) {
+              attributes.push(item);
+            }
+          });
+          model.addClass(currentClass, attributes, methods);
           readingClassContent = false;
           currentClass = null;
+          classContentBuffer = [];
         } else {
-          // Aquí procesaríamos atributos y métodos
-          // Por simplicidad, agregamos la clase vacía por ahora
+          classContentBuffer.push(line);
         }
       }
       // Parsear herencia
@@ -134,10 +146,10 @@ export const parseMermaidToUmlModel = (mermaidCode) => {
             association.targetMultiplicity
           );
           // Asegurarse de que las clases existan
-          if (!model.classes.has(association.source)) {
+          if (!model.classes.has(association.source.toLowerCase())) {
             model.addClass(association.source, [], []);
           }
-          if (!model.classes.has(association.target)) {
+          if (!model.classes.has(association.target.toLowerCase())) {
             model.addClass(association.target, [], []);
           }
         }
@@ -145,7 +157,7 @@ export const parseMermaidToUmlModel = (mermaidCode) => {
     }
   }
 
-  // Procesar clases con contenido completo
+  // Procesar bloques de clases con contenido completo (por si hay clases no procesadas en el bucle principal)
   processClassContent(mermaidCode, model);
 
   return {
