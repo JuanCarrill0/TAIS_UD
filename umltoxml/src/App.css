@@ -157,6 +157,12 @@
   outline: none;
   background: #22304a;
   color: #f8f8f2;
+  overflow: auto;
+  min-width: 0;
+  min-height: 0;
+  max-width: 100%;
+  max-height: 100%;
+  white-space: pre;
 }
 
 .mermaid-preview {
@@ -165,11 +171,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #eaf6fb; /* Fondo más claro para la vista previa */
+  background: #eaf6fb;
   overflow: auto;
-}
-
-.mermaid-preview svg {
+  min-width: 0;
+  min-height: 0;
   max-width: 100%;
   max-height: 100%;
 }

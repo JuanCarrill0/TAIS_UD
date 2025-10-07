@@ -1,19 +1,20 @@
-// utils/mermaidParser.js
+// utils/mermaidParser.js - VERSIÓN CORREGIDA
 
-// Modelo para representar el UML parseado
 export class UmlModel {
   constructor() {
     this.classes = new Map();
     this.associations = [];
     this.inheritances = [];
+    this.realizations = []; // Para relaciones de realización
   }
 
-  addClass(className, attributes = [], methods = []) {
+  addClass(className, attributes = [], methods = [], stereotype = null) {
     const id = className.toLowerCase();
     this.classes.set(id, {
       name: className,
       attributes: Array.isArray(attributes) ? attributes.map(attr => this.parseAttribute(attr)) : [],
       methods: Array.isArray(methods) ? methods.map(method => this.parseMethod(method)) : [],
+      stereotype: stereotype,
       id
     });
   }
@@ -33,6 +34,15 @@ export class UmlModel {
       parent: parent.toLowerCase(),
       child: child.toLowerCase(),
       type: 'inheritance'
+    });
+  }
+
+  // CORREGIDO: Cambié 'interface' por 'interfaceName' para evitar palabra reservada
+  addRealization(interfaceName, implementer) {
+    this.realizations.push({
+      interface: interfaceName.toLowerCase(),
+      implementer: implementer.toLowerCase(),
+      type: 'realization'
     });
   }
 
@@ -78,6 +88,7 @@ export const parseMermaidToUmlModel = (mermaidCode) => {
   let currentClass = null;
   let readingClassContent = false;
   let classContentBuffer = [];
+  let currentStereotype = null;
 
   for (const line of lines) {
     if (line.startsWith('classDiagram')) {
@@ -86,47 +97,60 @@ export const parseMermaidToUmlModel = (mermaidCode) => {
     }
 
     if (currentSection === 'classDiagram') {
-      // Parsear definición de clase
+      // Detectar estereotipos en líneas de clase
+      const stereotypeMatch = line.match(/class\s+(\w+)\s*\{\s*<<(abstract|interface)>>/);
+      if (stereotypeMatch) {
+        currentClass = stereotypeMatch[1];
+        currentStereotype = stereotypeMatch[2];
+        readingClassContent = true;
+        classContentBuffer = [];
+        continue;
+      }
+
+      // Parsear definición de clase normal
       if (line.startsWith('class ')) {
         const classMatch = line.match(/class\s+(\w+)\s*\{?/);
         if (classMatch) {
           currentClass = classMatch[1];
+          currentStereotype = null;
           classContentBuffer = [];
           if (line.includes('{')) {
             readingClassContent = true;
           } else {
-            model.addClass(currentClass, [], []);
+            model.addClass(currentClass, [], [], currentStereotype);
             currentClass = null;
+            currentStereotype = null;
           }
         }
       }
+      
       // Parsear contenido de clase
       else if (readingClassContent && currentClass) {
         if (line.includes('}')) {
-          // Procesar atributos y métodos
           const attributes = [];
           const methods = [];
           classContentBuffer.forEach(item => {
             if (item.includes('(') && item.includes(')')) {
               methods.push(item);
-            } else if (item.trim()) {
+            } else if (item.trim() && !item.includes('<<')) {
               attributes.push(item);
             }
           });
-          model.addClass(currentClass, attributes, methods);
+          model.addClass(currentClass, attributes, methods, currentStereotype);
           readingClassContent = false;
           currentClass = null;
+          currentStereotype = null;
           classContentBuffer = [];
-        } else {
+        } else if (!line.includes('<<')) {
           classContentBuffer.push(line);
         }
       }
+      
       // Parsear herencia
       else if (line.includes('<|--')) {
         const inheritanceMatch = line.match(/(\w+)\s*<\|--\s*(\w+)/);
         if (inheritanceMatch) {
           model.addInheritance(inheritanceMatch[1], inheritanceMatch[2]);
-          // Asegurarse de que las clases existan en el modelo
           if (!model.classes.has(inheritanceMatch[1].toLowerCase())) {
             model.addClass(inheritanceMatch[1], [], []);
           }
@@ -135,6 +159,21 @@ export const parseMermaidToUmlModel = (mermaidCode) => {
           }
         }
       }
+      
+      // Parsear relaciones de realización (..|>)
+      else if (line.includes('..|>')) {
+        const realizationMatch = line.match(/(\w+)\s*\.\.\|\>\s*(\w+)/);
+        if (realizationMatch) {
+          model.addRealization(realizationMatch[2], realizationMatch[1]);
+          if (!model.classes.has(realizationMatch[1].toLowerCase())) {
+            model.addClass(realizationMatch[1], [], []);
+          }
+          if (!model.classes.has(realizationMatch[2].toLowerCase())) {
+            model.addClass(realizationMatch[2], [], []);
+          }
+        }
+      }
+      
       // Parsear asociaciones
       else if (line.includes('--') || line.includes('-->')) {
         const association = parseAssociation(line);
@@ -145,7 +184,6 @@ export const parseMermaidToUmlModel = (mermaidCode) => {
             association.sourceMultiplicity,
             association.targetMultiplicity
           );
-          // Asegurarse de que las clases existan
           if (!model.classes.has(association.source.toLowerCase())) {
             model.addClass(association.source, [], []);
           }
@@ -157,21 +195,55 @@ export const parseMermaidToUmlModel = (mermaidCode) => {
     }
   }
 
-  // Procesar bloques de clases con contenido completo (por si hay clases no procesadas en el bucle principal)
+  // Procesar bloques de clases con contenido completo
   processClassContent(mermaidCode, model);
 
   return {
     classes: Array.from(model.classes.values()),
     associations: model.associations,
-    inheritances: model.inheritances
+    inheritances: model.inheritances,
+    realizations: model.realizations
   };
 };
 
 // Procesar contenido completo de clases
 const processClassContent = (mermaidCode, model) => {
-  const classBlocks = mermaidCode.match(/class\s+\w+\s*\{[^}]+\}/g) || [];
+  // Buscar clases con estereotipos
+  const stereotypeBlocks = mermaidCode.match(/class\s+\w+\s*\{\s*<<(abstract|interface)>>[^}]+\}/g) || [];
   
-  classBlocks.forEach(block => {
+  stereotypeBlocks.forEach(block => {
+    const classMatch = block.match(/class\s+(\w+)/);
+    const stereotypeMatch = block.match(/<<(abstract|interface)>>/);
+    
+    if (classMatch && stereotypeMatch) {
+      const className = classMatch[1];
+      const stereotype = stereotypeMatch[1];
+      const content = block.match(/\{([^}]+)\}/);
+      
+      if (content) {
+        const lines = content[1].split('\n').map(line => line.trim()).filter(line => line && !line.includes('<<'));
+        const attributes = [];
+        const methods = [];
+        
+        lines.forEach(line => {
+          if (line.includes('(') && line.includes(')')) {
+            methods.push(line);
+          } else if (line.trim()) {
+            attributes.push(line);
+          }
+        });
+        
+        model.addClass(className, attributes, methods, stereotype);
+      }
+    }
+  });
+
+  // Procesar clases normales (sin estereotipos)
+  const normalBlocks = mermaidCode.match(/class\s+\w+\s*\{[^}]*\}/g) || [];
+  
+  normalBlocks.forEach(block => {
+    if (block.includes('<<')) return;
+    
     const classMatch = block.match(/class\s+(\w+)/);
     if (classMatch) {
       const className = classMatch[1];
@@ -190,7 +262,9 @@ const processClassContent = (mermaidCode, model) => {
           }
         });
         
-        model.addClass(className, attributes, methods);
+        if (!model.classes.has(className.toLowerCase())) {
+          model.addClass(className, attributes, methods, null);
+        }
       }
     }
   });
@@ -198,7 +272,6 @@ const processClassContent = (mermaidCode, model) => {
 
 // Parsear línea de asociación
 const parseAssociation = (line) => {
-  // Patrón básico para asociaciones simples
   const simplePattern = /(\w+)\s*--\s*(\w+)/;
   const simpleMatch = line.match(simplePattern);
   
@@ -211,7 +284,6 @@ const parseAssociation = (line) => {
     };
   }
   
-  // Patrón para asociaciones con multiplicidad
   const multiPattern = /(\w+)\s*"([^"]*)"\s*-->\s*"([^"]*)"\s*(\w+)/;
   const multiMatch = line.match(multiPattern);
   
