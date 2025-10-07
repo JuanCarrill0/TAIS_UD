@@ -29,7 +29,7 @@ const XmlTransformer = ({ xmlContent }) => {
         alert('No hay contenido para descargar');
         return;
       }
-      downloadFile(xmlContent, 'modeloXML.xml', 'application/xml-dtd');
+      downloadFile(xmlContent, 'modeloXML.xmi', 'application/xml-dtd');
     };
 
   return (

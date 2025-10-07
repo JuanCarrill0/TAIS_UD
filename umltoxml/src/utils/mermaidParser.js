@@ -9,18 +9,19 @@ export class UmlModel {
   }
 
   addClass(className, attributes = [], methods = []) {
-    this.classes.set(className, {
+    const id = className.toLowerCase();
+    this.classes.set(id, {
       name: className,
-      attributes: attributes.map(attr => this.parseAttribute(attr)),
-      methods: methods.map(method => this.parseMethod(method)),
-      id: className.toLowerCase()
+      attributes: Array.isArray(attributes) ? attributes.map(attr => this.parseAttribute(attr)) : [],
+      methods: Array.isArray(methods) ? methods.map(method => this.parseMethod(method)) : [],
+      id
     });
   }
 
   addAssociation(source, target, sourceMultiplicity, targetMultiplicity) {
     this.associations.push({
-      source,
-      target,
+      source: source.toLowerCase(),
+      target: target.toLowerCase(),
       sourceMultiplicity: sourceMultiplicity || '1',
       targetMultiplicity: targetMultiplicity || '1',
       type: 'association'
@@ -29,8 +30,8 @@ export class UmlModel {
 
   addInheritance(parent, child) {
     this.inheritances.push({
-      parent,
-      child,
+      parent: parent.toLowerCase(),
+      child: child.toLowerCase(),
       type: 'inheritance'
     });
   }
@@ -114,11 +115,11 @@ export const parseMermaidToUmlModel = (mermaidCode) => {
         if (inheritanceMatch) {
           model.addInheritance(inheritanceMatch[1], inheritanceMatch[2]);
           // Asegurarse de que las clases existan en el modelo
-          if (!model.classes.has(inheritanceMatch[1])) {
-            model.addClass(inheritanceMatch[1]);
+          if (!model.classes.has(inheritanceMatch[1].toLowerCase())) {
+            model.addClass(inheritanceMatch[1], [], []);
           }
-          if (!model.classes.has(inheritanceMatch[2])) {
-            model.addClass(inheritanceMatch[2]);
+          if (!model.classes.has(inheritanceMatch[2].toLowerCase())) {
+            model.addClass(inheritanceMatch[2], [], []);
           }
         }
       }
@@ -134,10 +135,10 @@ export const parseMermaidToUmlModel = (mermaidCode) => {
           );
           // Asegurarse de que las clases existan
           if (!model.classes.has(association.source)) {
-            model.addClass(association.source);
+            model.addClass(association.source, [], []);
           }
           if (!model.classes.has(association.target)) {
-            model.addClass(association.target);
+            model.addClass(association.target, [], []);
           }
         }
       }
@@ -147,7 +148,11 @@ export const parseMermaidToUmlModel = (mermaidCode) => {
   // Procesar clases con contenido completo
   processClassContent(mermaidCode, model);
 
-  return model;
+  return {
+    classes: Array.from(model.classes.values()),
+    associations: model.associations,
+    inheritances: model.inheritances
+  };
 };
 
 // Procesar contenido completo de clases
